@@ -88,6 +88,41 @@ test('if request doesnt contain title or url, response 400 bad request', async (
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
 })
 
+test('blog can be deleted', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToDelete = blogsAtStart[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1)
+
+  const titles = blogsAtEnd.map(r => r.title)
+
+  expect(titles).not.toContain(blogToDelete.title)
+})
+
+test('blog can be edited', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToEdit = blogsAtStart[0]
+
+  await api
+    .put(`/api/blogs/${blogToEdit.id}`)
+    .send({title: "random title"})
+    .expect(200)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  const titles = blogsAtEnd.map(r => r.title)
+
+  expect(titles).toContain("random title")
+})
+
+
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
