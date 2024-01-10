@@ -121,8 +121,6 @@ test('blog can be edited', async () => {
   expect(titles).toContain("random title")
 })
 
-
-
 afterAll(async () => {
   await mongoose.connection.close()
 })
